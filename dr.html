@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Robot Delivery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 100px; }
+    button { padding: 15px 30px; font-size: 18px; }
+    #status { margin-top: 20px; color: green; }
+  </style>
+</head>
+<body>
+  <h2>Robot Delivery Request</h2>
+  <button onclick="sendLocation()">🚀 Deliver to Me</button>
+  <p id="status"></p>
+
+  <script>
+    function sendLocation() {
+      document.getElementById('status').innerText = 'Getting location...';
+      if (!navigator.geolocation) {
+        document.getElementById('status').innerText = 'Geolocation not supported.';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        document.getElementById('status').innerText = 'Sending location...';
+
+        fetch('submit_location.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lat: lat, lon: lon })
+        })
+        .then(res => res.text())
+        .then(msg => document.getElementById('status').innerText = msg)
+        .catch(err => document.getElementById('status').innerText = 'Error sending location.');
+      }, function(err) {
+        document.getElementById('status').innerText = 'Permission denied or unavailable.';
+      });
+    }
+  </script>
+</body>
+</html>
